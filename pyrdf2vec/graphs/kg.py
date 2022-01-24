@@ -53,6 +53,8 @@ class KG:
             Defaults to False.
         skip_predicates: The label predicates to skip from the KG.
             Defaults to set.
+        include_predicates: The label predicates to include for the KG.
+            Defaults to set.
         skip_verify: To skip or not the verification of existing entities in a
             Knowledge Graph. Its deactivation can improve HTTP latency for KG
             remotes.
@@ -70,6 +72,14 @@ class KG:
     )
 
     skip_predicates = attr.ib(
+        factory=set,
+        type=Set[str],
+        validator=attr.validators.deep_iterable(
+            member_validator=attr.validators.instance_of(str)
+        ),
+    )
+
+    include_predicates = attr.ib(
         factory=set,
         type=Set[str],
         validator=attr.validators.deep_iterable(
@@ -208,7 +218,13 @@ class KG:
             otherwise.
 
         """
-        if pred.name not in self.skip_predicates:
+        follow = False
+        if self.include_predicates and pred.name in self.include_predicates:
+            follow = True
+        if self.skip_predicates and pred.name not in self.skip_predicates:
+            follow = True
+
+        if follow:
             self.add_vertex(subj)
             self.add_vertex(pred)
             self.add_vertex(obj)
@@ -491,6 +507,12 @@ class KG:
                 vprev=vertex,
                 vnext=obj,
             )
-            if pred.name not in self.skip_predicates:
+            follow = False
+            if self.include_predicates and pred.name in self.include_predicates:
+                follow = True
+            if self.skip_predicates and pred.name not in self.skip_predicates:
+                follow = True
+
+            if follow:
                 hops.append((pred, obj))
         return hops
