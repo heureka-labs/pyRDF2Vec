@@ -253,7 +253,7 @@ class RDF2VecTransformer:
             var: The new values to add.
 
         """
-        if attr is None:
+        if not attr:
             attr = values
         elif isinstance(values[0], str):
             for i, entity in enumerate(values):
