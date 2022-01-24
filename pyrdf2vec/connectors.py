@@ -13,6 +13,7 @@ from cachetools import Cache, TTLCache, cachedmethod
 from cachetools.keys import hashkey
 
 from pyrdf2vec.typings import Literal, Response
+import json
 
 
 @attr.s
@@ -133,7 +134,15 @@ class SPARQLConnector(Connector):
         """
         url = f"{self.endpoint}/query?query={parse.quote(query)}"
         with requests.get(url, headers=self._headers) as res:
-            return res.json()
+            try:
+                val = res.json()
+            except json.decoder.JSONDecodeError:
+                print(query)
+                print(res.text)
+                val = {}
+                val["results"] = {}
+                val["results"]["bindings"] = ""
+            return val
 
     def get_query(self, entity: str, preds: Optional[List[str]] = None) -> str:
         """Gets the SPARQL query for an entity.

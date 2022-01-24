@@ -236,8 +236,9 @@ class KG:
         elif vertex.name.startswith("http://") or vertex.name.startswith(
             "https://"
         ):
-            res = self.connector.fetch(self.connector.get_query(vertex.name))
-            hops = self._res2hops(vertex, res["results"]["bindings"])
+            if ' ' not in vertex.name:
+                res = self.connector.fetch(self.connector.get_query(vertex.name))
+                hops = self._res2hops(vertex, res["results"]["bindings"])
         return hops
 
     def get_hops(self, vertex: Vertex, is_reverse: bool = False) -> List[Hop]:
