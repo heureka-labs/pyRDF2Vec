@@ -161,7 +161,7 @@ class SPARQLConnector(Connector):
             query = f"SELECT ?o WHERE {{ <{entity}> <{preds[0]}> "
             for i in range(1, len(preds)):
                 query += f"?o{i} . ?o{i} <{preds[i]}> "
-        query += "?o . }"
+        query += "?o . FILTER ( lang(?o) = 'en' || lang(?o) = 'de' ) }"
         return query
 
     def res2literals(self, res) -> Union[Literal, Tuple[Literal, ...]]:
