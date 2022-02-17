@@ -388,8 +388,15 @@ class KG:
                     for res in asyncio.run(self.connector.afetch(queries))
                 ]
             else:
-                responses = [self.connector.fetch(query) for query in queries]
-                responses = [res["boolean"] for res in responses]
+                connector_responses = [self.connector.fetch(query) for query in queries]
+                responses = []
+                for res in connector_responses:
+                    if "boolean" in res:
+                        responses.append(res["boolean"])
+                    else:
+                        print('boolean not found')
+                        print(res)
+                        responses.append(False)
             return False not in responses
         return all([Vertex(entity) in self._vertices for entity in entities])
 
